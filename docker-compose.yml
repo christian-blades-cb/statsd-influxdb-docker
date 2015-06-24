@@ -1,0 +1,31 @@
+statsd:
+  build: .
+  ports:
+    - 8125:8125/udp
+    - 8126:8126
+  links:
+    - influxdb
+  environment:
+    - INFLUXDB_HOST=influxdb
+    - INFLUXDB_VERSION=0.9
+    - INFLUXDB_DATABASE=dee
+sinewave:
+  image: christianbladescb/statsd-sinewave
+  links: 
+    - statsd
+  environment:
+    - STATSD_HOST=statsd:8125
+    - DELAY=50
+influxdb:
+  image: tutum/influxdb
+  ports:
+    - 8083
+    - 8086
+  environment:
+    - PRE_CREATE_DB=dee
+grafana:
+  image: grafana/grafana
+  ports: 
+    - 3000:3000
+  links: 
+    - influxdb
